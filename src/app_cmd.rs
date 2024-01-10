@@ -1,14 +1,16 @@
-use clap::{crate_version, Command};
+use clap::{crate_version, Arg, Command};
 
 pub const VERSION: &str = crate_version!();
 
 pub fn app_cmd() -> Command {
-	Command::new("awesome-app")
-		.version(VERSION)
-		.about("Awesome CLI Runner")
-		.subcommand(sub_dev())
-}
-
-fn sub_dev() -> Command {
-	Command::new("dev").about("Starts hot-reload developement")
+	Command::new("awesome").version(VERSION).about("Awesome CLI Runner").arg(
+		Arg::new("INPUT")
+			.help(
+				r#"- `group_name` to execute all commands in a group (from `[[runners.group_name]]`).
+- `group_name.runner_name` to execute a specific command from a group (found in `[[runners.group_name]]`, then search by name).
+- `solo_runner_name` from the `[[runner]]` table (matched by the name property)."#,
+			)
+			.required(true)
+			.index(1),
+	)
 }

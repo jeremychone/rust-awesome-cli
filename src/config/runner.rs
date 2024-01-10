@@ -1,5 +1,6 @@
 use crate::exec::{spawn_and_wait, spawn_tokio};
-use crate::prelude::*;
+use crate::utils::W;
+use crate::Result;
 use serde_derive::Deserialize;
 use std::path::Path;
 use std::time::Duration;
@@ -61,7 +62,6 @@ impl Runner {
 		// --- Compute the cmd args and working dir
 		let args: Vec<&str> = W(&self.args).into();
 		let cwd = self.working_dir.as_ref().map(Path::new);
-		println!("->> working dir {cwd:?} {cmd_str} {args:?}");
 
 		// --- Execute the command
 		if !self.concurrent {
@@ -81,7 +81,7 @@ impl Runner {
 		if let Some(no_file_at) = no_file_at {
 			let no_file = root_dir.join(no_file_at);
 			if Path::exists(&no_file) {
-				return Ok(ShouldRun::No(f!("Path '{no_file_at}' found.")));
+				return Ok(ShouldRun::No(format!("Path '{no_file_at}' found.")));
 			}
 		}
 

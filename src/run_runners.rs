@@ -1,5 +1,5 @@
-use crate::config::{ensure_awesome_toml, ShouldRun};
-use crate::prelude::*;
+use crate::config::{find_and_parse_awesome_toml, Runner, ShouldRun};
+use crate::{Error, Result};
 use clap::ArgMatches;
 use std::collections::HashMap;
 use std::path::Path;
@@ -11,12 +11,44 @@ use tokio::time::sleep;
 const WATCH_CHILD_DELAY: u64 = 3000; // in ms
 
 #[tokio::main]
-pub async fn run_dev(_sub_cmd: &ArgMatches) -> Result<()> {
+pub async fn run(run_ref: &str) -> Result<()> {
+	// -- Parse the command
+	let mut parts = run_ref.splitn(2, '.');
+	let part1 = parts.next().ok_or_else(|| Error::RunRefNoParts(run_ref.to_string()))?;
+	let part2 = parts.next();
+
+	// -- Parse the "Awesome.toml"
+	// TODO: might want to check if "./" works on windows
+	let config = find_and_parse_awesome_toml(Path::new("./"))?;
+
+	// -- Compute the Runners
+	// If two parts, then, we have a group_name.runner_name
+	let runners = if let Some(part2) = part2 {
+		config.get_grouped_runner(part1, part2).map(|r| vec![r])
+	}
+	// otherwise, we just have a group or a solo runner
+	else {
+		config
+			.get_runners(part1)
+			.or_else(|| config.get_solo_runner(part1).map(|r| vec![r]))
+	};
+
+	// -- Run the runners
+	if let Some(runners) = runners {
+		run_runners(runners).await?;
+	} else {
+		println!("No runners found for '{run_ref}'");
+	}
+
+	Ok(())
+}
+
+async fn run_runners(runners: Vec<&Runner>) -> Result<()> {
 	// TODO: needs to get it from the params.
 	let root_dir = Path::new(".");
 
 	// Read or create/read the Awesome.toml config with the dev runners.
-	let config = ensure_awesome_toml(root_dir)?;
+	let config = find_and_parse_awesome_toml(root_dir)?;
 
 	// Vec to keep track of the concurrent processes.
 	struct RunnerConcurrentSpawn {
@@ -27,25 +59,23 @@ pub async fn run_dev(_sub_cmd: &ArgMatches) -> Result<()> {
 	let mut children_to_watch: Vec<RunnerConcurrentSpawn> = Vec::new();
 
 	// --- Exec each runner.
-	if let Some(runners) = config.dev.and_then(|v| v.runners) {
-		for runner in runners.iter() {
-			println!("==== Running runner: {}", runner.name);
+	for runner in runners.iter() {
+		println!("==== Running runner: {}", runner.name);
 
-			match runner.should_run(root_dir)? {
-				ShouldRun::No(reason) => println!("Skip running runner '{}' because {reason}", runner.name),
-				ShouldRun::Yes => {
-					// exec the runner.
-					// returns a child if process is concurrent.
-					let child = runner.exec().await?;
+		match runner.should_run(root_dir)? {
+			ShouldRun::No(reason) => println!("Skip running runner '{}' because {reason}", runner.name),
+			ShouldRun::Yes => {
+				// exec the runner.
+				// returns a child if process is concurrent.
+				let child = runner.exec().await?;
 
-					// if concurrent, keep an eye on this child.
-					if let Some(child) = child {
-						children_to_watch.push(RunnerConcurrentSpawn {
-							name: runner.name.to_string(),
-							child,
-							end_all_on_exit: runner.end_all_on_exit,
-						});
-					}
+				// if concurrent, keep an eye on this child.
+				if let Some(child) = child {
+					children_to_watch.push(RunnerConcurrentSpawn {
+						name: runner.name.to_string(),
+						child,
+						end_all_on_exit: runner.end_all_on_exit,
+					});
 				}
 			}
 		}

@@ -1,6 +1,6 @@
 [package]
 name = "awesome-cli"
-version = "0.0.1"
+version = "0.1.0-beta.1"
 authors = ["Jeremy Chone <jeremy.chone@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "A command runner designed to streamline command orchestration."
@@ -8,6 +8,10 @@ categories = ["command-line-utilities"]
 edition = "2021"
 homepage = "https://github.com/jeremychone/rust-awesome-cli"
 repository = "https://github.com/jeremychone/rust-awesome-cli"
+
+[lints.rust]
+unsafe_code = "forbid"
+unused = "allow" # For exploratory dev.
 
 [[bin]]
 name = "awesome"

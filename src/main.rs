@@ -1,15 +1,14 @@
-// #![allow(unused)]
-use crate::prelude::*;
 use app_cmd::app_cmd;
-use run_dev::run_dev;
+use run_runners::run;
 
 mod app_cmd;
 mod config;
 mod error;
 mod exec;
-mod prelude;
-mod run_dev;
+mod run_runners;
 mod utils;
+
+pub use self::error::{Error, Result};
 
 pub use app_cmd::VERSION;
 
@@ -22,14 +21,14 @@ fn main() {
 
 fn cmd_run() -> Result<()> {
 	let app = app_cmd().get_matches();
+	let input = app.get_one::<String>("INPUT");
 
-	match app.subcommand() {
-		Some(("dev", sub_cmd)) => run_dev(sub_cmd)?,
-		_ => {
-			// needs cmd_app version as the orginal got consumed by get_matches
-			app_cmd().print_long_help()?;
-			println!("\n");
-		}
+	if let Some(input) = input {
+		run(input)?;
+	} else {
+		// needs cmd_app version as the orginal got consumed by get_matches
+		app_cmd().print_long_help()?;
+		println!("\n");
 	}
 
 	Ok(())

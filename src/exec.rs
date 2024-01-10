@@ -1,4 +1,4 @@
-use crate::prelude::*;
+use crate::{Error, Result};
 use std::io::{self, stdin, Write};
 use std::path::Path;
 use std::process::{Command, Stdio};
@@ -88,7 +88,7 @@ pub fn spawn_output(cwd: Option<&Path>, cmd_str: &str, args: &[&str], print_exec
 			};
 
 			match txt {
-				Err(ex) => Err(Error::Exec(s!(cmd_str), f!("{ex:?}"))),
+				Err(ex) => Err(Error::Exec(cmd_str.to_string(), format!("{ex:?}"))),
 				Ok(txt) => Ok(txt),
 			}
 		}
