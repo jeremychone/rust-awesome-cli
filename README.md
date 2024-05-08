@@ -1,4 +1,6 @@
-# awesome-cli is a command line tool that orchestrates other command lines
+# awesome-cli - command line runner
+
+> DISCLAIMER: Version `0.1.x` is still a work in progress and might see some changes. Awesome-cli will follow semver more strictly for version `0.2.x` and onwards.
 
 awesome-cli allows you to describe a set of commands as either groups or individually, and run them accordingly.
 

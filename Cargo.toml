@@ -1,6 +1,6 @@
 [package]
 name = "awesome-cli"
-version = "0.1.0-beta.2"
+version = "0.1.0"
 authors = ["Jeremy Chone <jeremy.chone@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "A command runner designed to streamline command orchestration."
