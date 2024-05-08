@@ -18,12 +18,17 @@ name = "awesome"
 path = "src/main.rs"
 
 [dependencies]
+# -- Async
 tokio = { version = "1", features = ["full"] }
+# -- CLI
 clap =  {version = "4", features = ["cargo"]}
 thiserror = "1"
+# -- Text
 aho-corasick = "1"
 regex = "1.6"
+# -- Json/Toml
 toml = "0.8"
 serde = "1"
 serde_derive = "1"
+# -- Others
 sysinfo = "0.30"

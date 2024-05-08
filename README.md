@@ -51,9 +51,7 @@ name = "pcss"
 working_dir = "frontend/"
 cmd = "npm"
 args = ["run", "pcss"]
-concurrent = true 
-# if this process exit, end the dev session
-end_all_on_exit = true
+
 
 # Now: runners, can ref other runner (only one hop for now)
 
@@ -61,16 +59,22 @@ end_all_on_exit = true
 ref = "build.tauri_icons"
 
 [[runners.dev]]
-ref = "build.cargo_build"
-# The args from the target will be overwritten with the following:
-args = ["watch", "build"]
-
-[[runners.dev]]
 ref = "build.pcss"
 # The args from the target will be extended with the args_add items
 args_add = ["--", "-w"]
+# will run concurrently
+concurrent = true 
+# if this process exit, end the dev session
+end_all_on_exit = true
 
 ```
+
+Then we can just run like so: 
+
+- `awesome build` - Will run all of the `runners.build` in order
+- `awesome dev` - Will run all `runnders.dev` in order
+- `awesome build.tauri_icons` - Will only run tauri icons command
+- `awesome list_files` - Will execute the solo runner named `list_files`
 
 <br />
 
