@@ -11,7 +11,6 @@ repository = "https://github.com/jeremychone/rust-awesome-cli"
 
 [lints.rust]
 unsafe_code = "forbid"
-unused = "allow" # For exploratory dev.
 
 [[bin]]
 name = "awesome"

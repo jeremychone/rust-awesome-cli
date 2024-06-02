@@ -10,9 +10,8 @@ use toml::{Table, Value}; // Wide for now.
 use crate::{Error, Result};
 use serde::Deserialize;
 use serde_derive::Deserialize;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::HashMap;
 use std::path::Path;
-use std::rc::Rc;
 use std::{fs, mem};
 
 // endregion: --- Modules
@@ -173,10 +172,9 @@ fn parse_awesome_toml(toml_str: &str) -> Result<Config> {
 			if let RunnerKind::Refed(ref_) = &refed_runner.kind {
 				if let Some(idx) = named_idx_by_key.get(ref_) {
 					if let Some(runner_base) = all_runners.get(*idx) {
-						if (runner_base.is_refed()) {
+						if runner_base.is_refed() {
 							return Err(Error::DoNotSupportRefToRefYet(refed_runner.get_key()));
 						}
-						let new_value = runner_base.value.clone();
 						// TODO: Should find a way to avoid refed_runner value clone
 						let new_value = merge_runner_values(runner_base.value.clone(), refed_runner.value.clone());
 						let new_runner = RunnerHolder::new(refed_runner.group.clone(), new_value)?;
@@ -189,7 +187,7 @@ fn parse_awesome_toml(toml_str: &str) -> Result<Config> {
 		}
 
 		if let Some((new_rh, refed_idx)) = new_runner_holder_for_idx {
-			mem::replace(&mut all_runners[refed_idx], new_rh);
+			let _ = mem::replace(&mut all_runners[refed_idx], new_rh);
 		}
 	}
 
@@ -219,7 +217,7 @@ fn parse_awesome_toml(toml_str: &str) -> Result<Config> {
 	})
 }
 
-fn merge_runner_values(mut base_value: Value, mut ov_value: Value) -> Value {
+fn merge_runner_values(base_value: Value, ov_value: Value) -> Value {
 	match (base_value, ov_value) {
 		(Value::Table(mut base_value), Value::Table(ov_value)) => {
 			for (name, value) in ov_value.into_iter() {

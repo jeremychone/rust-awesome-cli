@@ -1,4 +1,15 @@
-# awesome-cli - command line runner
+# **IMPORTANT** Deprecated: Use [arun](https://github.com/jeremychone/rust-arun)
+
+This is deprecated. The new crate is [arun](https://github.com/jeremychone/rust-arun).
+
+[arun](https://github.com/jeremychone/rust-arun) is the maintained version. It provides the lib `arun` that can be embedded in code, or the CLI `arun-cli` which uses the lib.
+
+<br />
+
+---
+---
+
+## For history only (DO NOT USE, use )
 
 > DISCLAIMER: Version `0.1.x` is still a work in progress and might see some changes. Awesome-cli will follow semver more strictly for version `0.2.x` and onwards.
 

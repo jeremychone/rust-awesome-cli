@@ -1,6 +1,5 @@
 use crate::config::{find_and_parse_awesome_toml, Runner, ShouldRun};
 use crate::{Error, Result};
-use clap::ArgMatches;
 use std::collections::HashMap;
 use std::path::Path;
 use std::time::Duration;
@@ -46,9 +45,6 @@ pub async fn run(run_ref: &str) -> Result<()> {
 async fn run_runners(runners: Vec<&Runner>) -> Result<()> {
 	// TODO: needs to get it from the params.
 	let root_dir = Path::new(".");
-
-	// Read or create/read the Awesome.toml config with the dev runners.
-	let config = find_and_parse_awesome_toml(root_dir)?;
 
 	// Vec to keep track of the concurrent processes.
 	struct RunnerConcurrentSpawn {
